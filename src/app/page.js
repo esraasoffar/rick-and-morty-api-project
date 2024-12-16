@@ -6,8 +6,6 @@ import "bootstrap/dist/js/bootstrap";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link'; // For navigation between pages
 
-
-
 export default function Home() {
 // Declare a state variable to hold the list of characters
 const [characters, setCharacters] = useState([]);
