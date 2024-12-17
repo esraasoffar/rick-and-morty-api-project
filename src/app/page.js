@@ -4,11 +4,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";;
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link'; // For navigation between pages
+import Pagination from './components/pagination/Pagination';
 
 export default function Home() {
 // Declare a state variable to hold the list of characters
 const [characters, setCharacters] = useState([]);        // State to store all characters
 const [searchQuery, setSearchQuery] = useState('');      // State for search input
+const [page, setPage] = useState(1);                // State for current page
+const [totalPages, setTotalPages] = useState(1);    // Total pages
   
 useEffect(() => { 
   // Dynamically import Bootstrap JS only on the client side
@@ -19,11 +22,16 @@ useEffect(() => {
 
 // Fetch characters data from Rick and Morty API when the component mounts
 useEffect(() => {
-  fetch('https://rickandmortyapi.com/api/character')
-    .then((response) => response.json())  // Convert response to JSON
-    .then((data) => setCharacters(data.results))  // Store the results in the state
-    .catch((error) => console.error('Error fetching data:', error));  // Handle any errors
-}, []); 
+  if (page) { // Ensure page has a valid value before running the effect
+    fetch(`https://rickandmortyapi.com/api/character?page=${page}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setCharacters(data.results);      // Update the characters
+        setTotalPages(data.info.pages);   // Update the total number of pages
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }
+}, [page]); // Dependency array includes 'page'
 
   // Filter characters based on the search query
   const filteredCharacters = characters.filter((char) =>
@@ -68,6 +76,13 @@ useEffect(() => {
           ))}
       </tbody>
     </table>
+     {/* Pagination Component */}
+     <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPrevious={() => setPage((prev) => Math.max(prev - 1, 1))}
+          onNext={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+        />
   </div>
     </div>
   );
